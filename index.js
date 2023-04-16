@@ -6,6 +6,7 @@ const Users = Models.User;
 
 mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
 
+
 const bodyParser = require('body-parser');
 const express = require('express');
     morgan = require('morgan');
@@ -17,6 +18,7 @@ app.use(bodyParser.json());
 // Use Morgan middleware library to log all requests
 app.use(morgan('common'));
 
+// CREATE A NEW USER
 app.post('/users', (req, res) => {
     Users.findOne({Username: req.body.Username})
     .then((user) => {
@@ -43,6 +45,30 @@ app.post('/users', (req, res) => {
     });
 })
 
+// GET ALL USERS
+app.get('/users', (req, res) => {
+  Users.find()
+  .then((users) => {
+      res.status(201).json(users);
+  })
+  .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+  });
+});
+
+// GET A USER BY USERNAME
+app.get('/users/:Username', (req, res) => {
+  Users.findOne({ Username: req.params.Username})
+  .then((user) => {
+      res.json(user);
+  })
+  .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+  });
+});
+
 // UPDATE USER 
 app.put('/users/:username', (req, res) => {
     Users.findOneAndUpdate({ Username: req.params.username }, { $set:
@@ -61,6 +87,21 @@ app.put('/users/:username', (req, res) => {
     });
   });
 
+// DELETE A USER BY USERNAME (DE-REGISTER)
+app.delete('/users/:Username', (req, res) => {
+  Users.findOneAndRemove({ Username: req.params.Username })
+    .then((user) => {
+      if (!user) {
+        res.status(400).send(req.params.Username + ' was not found');
+      } else {
+        res.status(200).send(req.params.Username + ' was deleted.');
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).send('Error: ' + err);
+    });
+});  
 
 // ADD A MOVIE TO USERS FAVORITES
 app.post('/users/:username/movies/:movieId', async (req, res) => {
@@ -78,59 +119,23 @@ app.post('/users/:username/movies/:movieId', async (req, res) => {
   }
 });
 
-// GET ALL USERS
-app.get('/users', (req, res) => {
-    Users.find()
-    .then((users) => {
-        res.status(201).json(users);
-    })
-    .catch((err) => {
-        console.error(err);
-        res.status(500).send('Error: ' + err);
-    });
-});
-
-// GET A USER BY USERNAME
-app.get('/users/:Username', (req, res) => {
-    Users.findOne({ Username: req.params.Username})
-    .then((user) => {
-        res.json(user);
-    })
-    .catch((err) => {
-        console.error(err);
-        res.status(500).send('Error: ' + err);
-    });
-});
-
-// DELETE A USER BY USERNAME
-app.delete('/users/:Username', (req, res) => {
-    Users.findOneAndRemove({ Username: req.params.Username })
-      .then((user) => {
-        if (!user) {
-          res.status(400).send(req.params.Username + ' was not found');
-        } else {
-          res.status(200).send(req.params.Username + ' was deleted.');
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        res.status(500).send('Error: ' + err);
-      });
-  });
-
 // DELETE (REMOVE) MOVIES IN USER LIST
-app.delete('/users/:id/movies/:MovieId', 
-// passport.authenticate('jwt', { session: false }),
- async (req, res) => {
+app.delete('/users/:id/movies/:MovieId', async (req, res) => {
   try {
     const user = await Users.findById(req.params.id).lean();
     if (!user) {
       return res.status(404).send('User not found');
     }
 
+    console.log(user.FavoriteMovies, `logging favourite movies`);
+
+    if (!Array.isArray(user.FavoriteMovies)) {
+      return res.status(400).send('FavoriteMovies is not an array');
+    }
+
     const updatedUser = await Users.findOneAndUpdate(
       { _id: req.params.id },
-      { $pull: { FavoriteMovies: req.params.MovieId } },
+      { $pull: { FavoriteMovies: new mongoose.Types.ObjectId(req.params.MovieId) } },
       { new: true }
     ).lean();
 
@@ -139,22 +144,6 @@ app.delete('/users/:id/movies/:MovieId',
     console.error(error);
     res.status(500).send(`Error: ${error.message}`);
   }
-});
-
-// DELETE USER (DE-REGISTER)
-app.delete('/users/:id', (req, res) => {
-    Users.findOneAndRemove({ Username: req.params.Username })
-    .then((user) => {
-      if (!user) {
-        res.status(400).send(req.params.Username + ' was not found');
-      } else {
-        res.status(200).send(req.params.Username + ' was deleted.');
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).send('Error: ' + err);
-    });
 });
 
 //READ ALL MOVIES
