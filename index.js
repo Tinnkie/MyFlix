@@ -7,11 +7,29 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 //mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
-main().catch((err) => console.log(err));
-async function main() {
-  mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
-  console.log("connected");
+// main().catch((err) => console.log(err));
+// async function main() {
+//   mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
+//   console.log("connected");
+// }
+
+// connects to the DB on the localhost
+const CONNECTION_URI = process.env.CONNECTION_URI;
+console.log(CONNECTION_URI);
+
+// This connects mongoose to mongodb database
+async function databaseConnect() {
+  try {
+    await mongoose.connect(CONNECTION_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('Connected to database');
+  } catch (error) {
+    console.log('Error connecting to database: ', error);
+  }
 }
+databaseConnect();
 
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -246,19 +264,17 @@ app.get('/movies/directors/:directorName', passport.authenticate('jwt', { sessio
     });
 }); 
 
-app.get ('/', (req, res) => {
-    res.send('Welcome to myFlix Movie Database');
+// READ
+app.get('/', (req, res) => {
+    res.sendFile('public/documentation.html', { root: __dirname });
 });
 
-app.get ('/movies', (req, res) => {
-    res.send(movies);
-});
 // Serve documentation.html
 app.use(express.static('public'));
 
-app.get('/documentation', (req, res) => {  
-   res.sendFile('public/documentation.html', { root: __dirname });
-  });
+// app.get('/documentation', (req, res) => {  
+//    res.sendFile('public/documentation.html', { root: __dirname });
+//   });
 
 // Error handling function
 app.use((err, req, res, next) => {
