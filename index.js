@@ -14,6 +14,12 @@ const express = require('express');
     uuid = require('uuid');
 
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+let auth = require('./auth.js')(app);
+
+const passport = require('passport');
+require('./passport.js');
 
 // Use Morgan middleware library to log all requests
 app.use(morgan('common'));
@@ -58,7 +64,7 @@ app.get('/users', (req, res) => {
 });
 
 // GET A USER BY USERNAME
-app.get('/users/:Username', (req, res) => {
+app.get('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOne({ Username: req.params.Username})
   .then((user) => {
       res.json(user);
@@ -70,7 +76,7 @@ app.get('/users/:Username', (req, res) => {
 });
 
 // UPDATE USER 
-app.put('/users/:username', (req, res) => {
+app.put('/users/:username', passport.authenticate('jwt', { session: false }), (req, res) => {
     Users.findOneAndUpdate({ Username: req.params.username }, { $set:
       {
         Username: req.body.Username,
@@ -88,7 +94,7 @@ app.put('/users/:username', (req, res) => {
   });
 
 // DELETE A USER BY USERNAME (DE-REGISTER)
-app.delete('/users/:Username', (req, res) => {
+app.delete('/users/:Username', passport.authenticate('jwt', { session: false }), (req, res) => {
   Users.findOneAndRemove({ Username: req.params.Username })
     .then((user) => {
       if (!user) {
@@ -104,7 +110,7 @@ app.delete('/users/:Username', (req, res) => {
 });  
 
 // ADD A MOVIE TO USERS FAVORITES
-app.post('/users/:username/movies/:movieId', async (req, res) => {
+app.post('/users/:username/movies/:movieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const updatedUser = await Users.findOneAndUpdate(
       { Username: req.params.username },
@@ -120,7 +126,7 @@ app.post('/users/:username/movies/:movieId', async (req, res) => {
 });
 
 // DELETE (REMOVE) MOVIES IN USER LIST
-app.delete('/users/:id/movies/:MovieId', async (req, res) => {
+app.delete('/users/:id/movies/:MovieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
     const user = await Users.findById(req.params.id).lean();
     if (!user) {
@@ -147,7 +153,7 @@ app.delete('/users/:id/movies/:MovieId', async (req, res) => {
 });
 
 //READ ALL MOVIES
-app.get('/movies', (req, res) => {
+app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) => {
     Movies.find()
     .then((movies) => {
       res.status(200).json(movies);
@@ -159,7 +165,7 @@ app.get('/movies', (req, res) => {
 });  
 
 //READ MOVIE TITLE
-app.get('/movies/:title', (req, res) => {
+app.get('/movies/:title', passport.authenticate('jwt', { session: false }), (req, res) => {
     const { title } = req.params;
     const movie = Movies.find (movie => movie.title === title);
 
@@ -171,7 +177,7 @@ app.get('/movies/:title', (req, res) => {
 })
 
 //READ GENRE
-app.get('/movies/genre/:genreName', (req, res) => {
+app.get('/movies/genre/:genreName', passport.authenticate('jwt', { session: false }), (req, res) => {
     Movies.findOne({ 'Genre.Name': req.params.genreName })
     .then((movie) => {
       res.json(movie.Genre);
@@ -183,7 +189,7 @@ app.get('/movies/genre/:genreName', (req, res) => {
 });
 
 //READ DIRECTOR
-app.get('/movies/directors/:directorName', (req, res) => {
+app.get('/movies/directors/:directorName', passport.authenticate('jwt', { session: false }), (req, res) => {
     Movies.findOne({ 'Director.Name': req.params.directorName })
     .then((movie) => {
       res.json(movie.Director);
