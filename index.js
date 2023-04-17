@@ -7,8 +7,11 @@ const Movies = Models.Movie;
 const Users = Models.User;
 
 //mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
-
+main().catch((err) => console.log(err));
+async function main() {
+  mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
+  console.log("connected");
+}
 
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -20,7 +23,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require('cors');
-let allowedOrigins = ['http://127.0.0.1:8080', 'http://testsite.com'];
+let allowedOrigins = ['http://0.0.0.1:8080', 'https://movieflix2023.herokuapp.com/'];
 
 app.use(cors({
   origin: (origin, callback) => {
