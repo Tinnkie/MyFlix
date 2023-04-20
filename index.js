@@ -8,29 +8,6 @@ const Users = Models.User;
 
 //mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
 mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
-// main().catch((err) => console.log(err));
-// async function main() {
-//   mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
-//   console.log("connected");
-// }
-
-// // connects to the DB on the localhost
-// const CONNECTION_URI = process.env.CONNECTION_URI;
-// console.log(CONNECTION_URI);
-
-// // This connects mongoose to mongodb database
-// async function databaseConnect() {
-//   try {
-//     await mongoose.connect(CONNECTION_URI, {
-//       useNewUrlParser: true,
-//       useUnifiedTopology: true,
-//     });
-//     console.log('Connected to database');
-//   } catch (error) {
-//     console.log('Error connecting to database: ', error);
-//   }
-// }
-// databaseConnect();
 
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -77,7 +54,7 @@ app.post('/users',   [
       return res.status(422).json({ errors: errors.array() });
     }
 
-    let hashedPassword = Users.hashPassword(req.body.Password);
+    const hashedPassword = Users.hashPassword(req.body.Password);
     Users.findOne({Username: req.body.Username})
     .then((user) => {
         if (user) {
@@ -86,7 +63,7 @@ app.post('/users',   [
             Users
             .create({
                 Username: req.body.Username,
-                Password: req.body.Password,
+                Password: hashedPassword,
                 Email: req.body.Email,
                 Birthday: req.body.Birthday
             })
@@ -141,11 +118,11 @@ app.put('/users/:username', passport.authenticate('jwt', { session: false }), [
       return res.status(422).json({ errors: errors.array() });
     }
 
-    let hashedPassword = Users.hashPassword(req.body.Password);
+    const hashedPassword = Users.hashPassword(req.body.Password);
     Users.findOneAndUpdate({ Username: req.params.username }, { $set:
       {
         Username: req.body.Username,
-        Password: req.body.Password,
+        Password: hashedPassword,
         Email: req.body.Email,
         Birthday: req.body.Birthday
       }
