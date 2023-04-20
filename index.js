@@ -6,8 +6,8 @@ const { check, validationResult } = require('express-validator');
 const Movies = Models.Movie;
 const Users = Models.User;
 
-// mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
-mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
+ mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
+//mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const bodyParser = require('body-parser');
 const express = require('express');
@@ -168,9 +168,9 @@ app.post('/users/:username/movies/:movieId', passport.authenticate('jwt', { sess
 });
 
 // DELETE (REMOVE) MOVIES IN USER LIST
-app.delete('/users/:id/movies/:MovieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
+app.delete('/users/:username/movies/:MovieId', passport.authenticate('jwt', { session: false }), async (req, res) => {
   try {
-    const user = await Users.findById(req.params.id).lean();
+    const user = await Users.findOne({Username: req.params.username}).lean();
     if (!user) {
       return res.status(404).send('User not found');
     }
@@ -182,7 +182,7 @@ app.delete('/users/:id/movies/:MovieId', passport.authenticate('jwt', { session:
     }
 
     const updatedUser = await Users.findOneAndUpdate(
-      { _id: req.params.id },
+      { Username: req.params.username },
       { $pull: { FavoriteMovies: new mongoose.Types.ObjectId(req.params.MovieId) } },
       { new: true }
     ).lean();
@@ -209,13 +209,18 @@ app.get('/movies', passport.authenticate('jwt', { session: false }), (req, res) 
 //READ MOVIE TITLE
 app.get('/movies/:title', passport.authenticate('jwt', { session: false }), (req, res) => {
     const { title } = req.params;
-    const movie = Movies.find (movie => movie.title === title);
-
+   Movies.findOne({Title: title})
+   .then((movie) => {
     if (movie) {
-        res.status(200).json(movie);
+      res.status(200).json(movie);
     } else {
-        res.status(400).send('No such movie!')
+      res.status(400).send('No such movie!')
     }
+   })
+   .catch((err) => {
+    console.error(err);
+    res.status(500).send('Error: ' + err);
+  });
 })
 
 //READ GENRE
