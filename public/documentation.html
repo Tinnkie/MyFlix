@@ -32,6 +32,13 @@
         <td>JSON object with user data</td>
       </tr>
       <tr>
+        <td>POST</td>
+        <td>/login</td>
+        <td>Login a user</td>
+        <td>JSON object with Username and Password</td>
+        <td>JSON object with user data and token</td>
+      </tr>
+      <tr>
         <td>GET</td>
         <td>/users</td>
         <td>Get all users</td>
@@ -68,7 +75,7 @@
       </tr>
       <tr>
           <td>DELETE</td>
-          <td>/users/:id/movies/:MovieId</td>
+          <td>/users/:username/movies/:MovieId</td>
           <td>Delete a movie from user's favorites</td>
           <td>None</td>
           <td>JSON object with updated user data</td>
