@@ -7,12 +7,11 @@
   </head>
   <body>
     <h1>MyFlix Movies Library</h1>
-    <p>As a user you will be able to receive information on available movies, directors, and genres so you can learn more about the movies you've watched or you are interested in.</p>
-    <p>You will be able to create a personal profile, and add or remove a movie from your list of favourites.</p>
+    <p>This document describes the available endpoints for the User and Movie API, along with their request and response formats. This API allows users to register, login, update their profile, and manage their favorite movies. It also provides endpoints to retrieve movies, genres, and directors from the database. The API supports JSON format for both requests and responses, and is secured with a <strong>JSON Web Token (JWT)</strong> authentication mechanism to protect user data.</p>
 
-    <h2>Endpoint Documentation</h2>
+    <h2>User and Movie API Endpoint Documentation</h2>
 
-    <table class="table">
+    <table class="table" border="1">
       <thead>
         <tr>
             <th>Method</th>
@@ -28,78 +27,104 @@
         <td>POST</td>
         <td>/users</td>
         <td>Create a new user</td>
-        <td>JSON object with Username, Password, Email, and Birthday</td>
-        <td>JSON object with user data</td>
+        <td>JSON object with the following fields:<br>
+          - Username (string, required)<br>
+          - Password (string, required)<br>
+          - Email (string, required, email format)<br>
+          - Birthday (date, optional)
+          <br><br>Example:<br>{
+          "Username": "johndoe",
+          "Password": "password123",
+          "Email": "johndoe@example.com",
+          "Birthday": "01-01-1990"
+          }</td>        
+          <td>JSON object with user data.</td>
       </tr>
       <tr>
         <td>POST</td>
         <td>/login</td>
         <td>Login a user</td>
-        <td>JSON object with Username and Password</td>
-        <td>JSON object with user data and token</td>
+        <td>JSON object with the following fields:<br>
+          - Username (string, required)<br>
+          - Password (string, required)
+          <br><br>Example:<br>{
+          "Username": "johndoe",
+          "Password": "password123"
+          }</td>        
+          <td>JSON object with user data and token.</td>
       </tr>
       <tr>
         <td>GET</td>
         <td>/users</td>
         <td>Get all users</td>
         <td>None</td>
-        <td>Array of JSON objects with user data</td>
+        <td>Array of JSON objects with user data.</td>
       </tr>
       <tr>
         <td>GET</td>
         <td>/users/:Username</td>
         <td>Get a user by username</td>
         <td>None</td>
-        <td>JSON object with user data</td>
+        <td>JSON object with user data.</td>
       </tr>
       <tr>
           <td>PUT</td>
           <td>/users/:username</td>
           <td>Update a user by username</td>
-          <td>JSON object with Username, Password, Email, and Birthday</td>
-          <td>JSON object with updated user data</td>
+          <td>JSON object with the following fields:<br>
+            - Username (string, required)<br>
+            - Password (string, required)<br>
+            - Email (string, required, email format)<br>
+            - Birthday (date, optional)
+            <br><br>Example:<br>{
+            "Username": "johndoe",
+            "Password": "newpassword",
+            "Email": "johndoe@example.com",
+            "Birthday": "01-01-1990"
+            }</td>          
+          <td>JSON object with updated user data.</td>
       </tr>
       <tr>
         <td>DELETE</td>
         <td>/users/:Username</td>
         <td>Delete a user by username</td>
         <td>None</td>
-        <td>Success or error message</td>
+        <td>Returns a success or error message.</td>
       </tr>
       <tr>
-          <td>POST</td>
-          <td>/users/:username/movies/:movieId</td>
-          <td>Add a movie to user's favorites</td>
-          <td>None</td>
-          <td>JSON object with updated user data</td>
+        <td>POST</td>
+        <td>/users/:username/movies/:movieId</td>
+        <td>Add a movie to user's favorites</td>
+        <td>None</td>
+        <td>Returns a JSON object with updated user data, including the newly added movie.</td>
       </tr>
       <tr>
-          <td>DELETE</td>
-          <td>/users/:username/movies/:MovieId</td>
-          <td>Delete a movie from user's favorites</td>
-          <td>None</td>
-          <td>JSON object with updated user data</td>
+        <td>DELETE</td>
+        <td>/users/:username/movies/:MovieId</td>
+        <td>Delete a movie from user's favorites</td>
+        <td>None</td>
+        <td>Returns a JSON object with updated user data, with the deleted movie removed from the favorites list.</td>
       </tr>
       <tr>
         <td>GET</td>
         <td>/movies/:title</td>
         <td>Retrieves a Movie from the database by its title</td>
         <td>None</td>
-        <td>JSON Movie object</td>
+        <td>Returns a JSON Movie object containing details about the movie.</td>
       </tr>
       <tr>
         <td>GET</td>
         <td>/movies/genre/:genreName</td>
         <td>Retrieves a Genre from the database</td>
         <td>None</td>
-        <td>JSON Genre object</td>
+        <td>Returns a JSON Genre object containing details about the genre, including a list of movies associated with it.</td>
       </tr>
       <tr>
         <td>GET</td>
         <td>/movies/directors/:directorName</td>
         <td>Retrieves a Director from the database</td>
         <td>None</td>
-        <td>JSON Director object</td>
+        <td>Returns a JSON Director object containing details about the director, including a list of movies directed by them.</td>
       </tr>
      </tbody>
      </table>
