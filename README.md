@@ -39,6 +39,6 @@
 
 <br>
 
-## <a href=https://movieflix2023.herokuapp.com/movies target="_blank"> Link to API </a>
+## <a href=https://movieflix2023.herokuapp.com/ target="_blank"> Link to API Documentation</a>
 
 ## Check my code: <a href=https://github.com/Tinnkie target="_blank"> Tinnkie GitHub </a>
