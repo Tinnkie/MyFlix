@@ -1,12 +1,14 @@
 const mongoose = require('mongoose');
-const Models = require('./models.js');
+const Models = require('./models');
 
 const { check, validationResult } = require('express-validator');
 
 const Movies = Models.Movie;
 const Users = Models.User;
 
-//mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
+const Movie = require('models/Movie')
+
+// mongoose.connect('mongodb://127.0.0.1:27017/cfDB', {useNewUrlParser: true, useUnifiedTopology: true});
 mongoose.connect(process.env.CONNECTION_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const bodyParser = require('body-parser');
@@ -19,7 +21,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 const cors = require('cors');
-let allowedOrigins = ['http://127.0.0.1:8080', 'https://movieflix2023.herokuapp.com/', 'http://localhost:1234'];
+let allowedOrigins = ['http://127.0.0.1:8080', 'https://movieflix2023.herokuapp.com/', 'http://localhost:1234', 'https://myflix2023.netlify.app/'];
 
 app.use(cors({
   origin: (origin, callback) => {
